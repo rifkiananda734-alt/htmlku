@@ -2,230 +2,35 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Untuk SESEORANG </title>
-
+<title>Untuk Seseorang</title>
 <style>
-*{box-sizing:border-box}
-body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background:#000;
-    color:#fff;
-    height:100vh;
-    overflow:hidden;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-}
-
-.screen{
-    width:100%;
-    max-width:360px;
-    padding:25px;
-}
-
-.hidden{display:none}
-
-h2,h3,p{margin:12px 0}
-
-button{
-    margin-top:15px;
-    background:#ff4d6d;
-    color:#fff;
-    border:none;
-    padding:12px 20px;
-    border-radius:25px;
-    font-size:15px;
-    cursor:pointer;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
-    margin-top:20px;
-}
-
-.card{
-    background:#ff4d6d;
-    height:60px;
-    border-radius:12px;
-    font-size:28px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:transparent;
-    cursor:pointer;
-}
-
-.card.open,.card.matched{
-    background:#fff;
-    color:#ff4d6d;
-}
-
-/* efek ketik */
-.type{
-    border-right:2px solid #fff;
-    white-space:pre-line;
-    animation:blink .8s infinite;
-}
-
-@keyframes blink{
-    50%{border-color:transparent}
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  cursor: pointer;
 }
 </style>
 </head>
-
 <body>
 
-<!-- TAP SCREEN -->
-<div class="screen" id="tap">
-    <p>Sentuh layar mana saja</p>
-</div>
+<h1>Klik sekali ya 🤍</h1>
 
-<!-- TEXT -->
-<div class="screen hidden" id="text">
-    <p class="type" id="typing"></p>
-</div>
-
-<!-- GAME -->
-<div class="screen hidden" id="game">
-    <p>Cocokkan semua ya</p>
-    <div class="grid" id="grid"></div>
-</div>
-
-<!-- END -->
-<div class="screen hidden" id="end">
-    <p class="type" id="endText"></p>
-    <button onclick="share()">Kirim ke Dia</button>
-</div>
-
-<audio id="music" loop>
-    <source src="musik.mp3" type="audio/mpeg">
+<audio id="musik" loop>
+  <source src="musik.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-// ===== NAMA =====
-const nama = new URLSearchParams(location.search).get("nama") || "kamu";
-
-// ===== MUSIK =====
-const music = document.getElementById("music");
-
-// ===== TAP =====
-document.body.addEventListener("click", start, { once:true });
-
-function start(){
-    music.play();
-    document.getElementById("tap").classList.add("hidden");
-    document.getElementById("text").classList.remove("hidden");
-    ketik(
-`Hai ${nama}.
-Aku nggak tau kamu bakal baca ini sampai habis atau enggak.
-
-Tapi kalau kamu di sini sekarang,
-berarti kamu cukup penasaran.
-
-Sebentar ya…`,
-        () => {
-            document.getElementById("text").classList.add("hidden");
-            document.getElementById("game").classList.remove("hidden");
-            initGame();
-        }
-    );
-}
-
-// ===== TYPE WRITER =====
-function ketik(teks, selesai){
-    const el = document.getElementById("typing");
-    el.innerHTML="";
-    let i=0;
-    const interval=setInterval(()=>{
-        el.innerHTML+=teks.charAt(i);
-        i++;
-        if(i>=teks.length){
-            clearInterval(interval);
-            setTimeout(selesai,1200);
-        }
-    },40);
-}
-
-// ===== MEMORY GAME =====
-const simbol=["❤️","❤️","🌹","🌹","✨","✨","💌","💌"];
-let first=null, lock=false, match=0;
-
-function initGame(){
-    const grid=document.getElementById("grid");
-    simbol.sort(()=>0.5-Math.random()).forEach(s=>{
-        const c=document.createElement("div");
-        c.className="card";
-        c.innerText=s;
-        c.onclick=()=>{
-            if(lock||c.classList.contains("open"))return;
-            c.classList.add("open");
-            if(!first){
-                first=c;
-            }else{
-                lock=true;
-                if(first.innerText===c.innerText){
-                    first.classList.add("matched");
-                    c.classList.add("matched");
-                    match+=2;
-                    first=null;
-                    lock=false;
-                    if(match===simbol.length){
-                        selesai();
-                    }
-                }else{
-                    setTimeout(()=>{
-                        first.classList.remove("open");
-                        c.classList.remove("open");
-                        first=null;
-                        lock=false;
-                    },700);
-                }
-            }
-        };
-        grid.appendChild(c);
-    });
-}
-
-// ===== SELESAI =====
-function selesai(){
-    document.getElementById("game").classList.add("hidden");
-    document.getElementById("end").classList.remove("hidden");
-
-    const endText =
-`Aku nggak jago ngerangkai kata.
-Tapi satu hal yang pasti:
-kalau malam ini aku diberi waktu untuk melihat mu tersenyum.
-mungkin aku akan menutup mataku sejenak.
-karna aku tidak bisa melihat bola matamu dengan bola mataku saling melihat
-
-Kalau kamu senyum sekarang,
-berarti aku berhasil.
-
-Dan iya,
-ini memang aku bikin buat kamu. ❤️`;
-
-    const el=document.getElementById("endText");
-    let i=0;
-    const interval=setInterval(()=>{
-        el.innerHTML+=endText.charAt(i);
-        i++;
-        if(i>=endText.length) clearInterval(interval);
-    },45);
-}
-
-// ===== SHARE =====
-function share(){
-    const txt=`Aku nemu ini dan kepikiran kamu ❤️\n${location.href}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`);
-}
+document.body.addEventListener("click", () => {
+  document.getElementById("musik").play();
+});
 </script>
-<audio autoplay loop>
-  <source src="musik.mp3" type="audio/mpeg">
-</audio>
+
 </body>
 </html>
